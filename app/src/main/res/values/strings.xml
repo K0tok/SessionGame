@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Сессия</string>
+    <string name="menu_title">Сессия</string>
+    <string name="menu_subtitle">Hot-seat · 2–4 игрока</string>
+    <string name="btn_new_game">Новая игра</string>
+    <string name="btn_rules">Правила</string>
+    <string name="lobby_title">Лобби</string>
+    <string name="lobby_stub">Здесь будут имена игроков и цвета фишек.</string>
+    <string name="btn_start_game">Начать игру</string>
+    <string name="btn_back">Назад</string>
+    <string name="rules_title">Правила</string>
+    <string name="rules_stub">Кратко: замкнутое поле из 20 клеток, кубик, три экзамена по 3 балла, затем финальная защита.</string>
+    <string name="game_title">Игровое поле</string>
+    <string name="game_stub">Здесь будет игровое поле, клетки и кубик.</string>
+</resources>
