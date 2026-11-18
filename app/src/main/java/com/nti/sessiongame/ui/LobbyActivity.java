@@ -1,5 +1,7 @@
 package com.nti.sessiongame.ui;
 
+import java.util.List;
+import java.util.ArrayList;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -14,9 +16,10 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.nti.sessiongame.R;
 
 public class LobbyActivity extends AppCompatActivity {
-
     private LinearLayout layoutPlayerInputs;
     private RadioGroup radioGroupPlayers;
+    private java.util.List<String> playerNamesList = new java.util.ArrayList<>();
+    private java.util.List<Integer> playerColorsList = new java.util.ArrayList<>();
     private final int[] playerColors = {
             Color.parseColor("#f71622"),
             Color.parseColor("#ff8426"),
@@ -27,6 +30,7 @@ public class LobbyActivity extends AppCompatActivity {
             Color.parseColor("#99f725"),
             Color.parseColor("#f05bf5"),
     };
+    private boolean[] usedColors = new boolean[playerColors.length];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,12 +47,27 @@ public class LobbyActivity extends AppCompatActivity {
             int playerCount = 2;
             if (checkedId == R.id.rb3Players) playerCount = 3;
             else if (checkedId == R.id.rb4Players) playerCount = 4;
+            for (int i = 0; i < usedColors.length; i++) usedColors[i] = false;
             updatePlayerInputs(playerCount);
         });
 
         // Кнопка начать
         findViewById(R.id.btnStartGame).setOnClickListener(v -> {
-            // TODO: Позже здесь собрать имена и цвета, и передать в GameActivity
+            if (playerNamesList.isEmpty() || playerColorsList.size() < playerNamesList.size()) {
+                android.widget.Toast.makeText(this, "Выберите цвет для каждого игрока!", android.widget.Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            String[] namesArray = playerNamesList.toArray(new String[0]);
+            int[] colorsArray = new int[playerColorsList.size()];
+            for (int i = 0; i < playerColorsList.size(); i++) {
+                colorsArray[i] = playerColorsList.get(i);
+            }
+
+            Intent intent = new Intent(this, GameActivity.class);
+            intent.putExtra("EXTRA_PLAYER_NAMES", namesArray);
+            intent.putExtra("EXTRA_PLAYER_COLORS", colorsArray);
+            startActivity(intent);
         });
 
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
@@ -57,6 +76,10 @@ public class LobbyActivity extends AppCompatActivity {
     //метод создания интерфейса
     private void updatePlayerInputs(int count) {
         layoutPlayerInputs.removeAllViews();
+        playerNamesList.clear();
+        playerColorsList.clear();
+
+        for (int i = 0; i < usedColors.length; i++) usedColors[i] = false;
 
         for (int i = 0; i < count; i++) {
             LinearLayout playerBlock = new LinearLayout(this);
@@ -68,6 +91,14 @@ public class LobbyActivity extends AppCompatActivity {
             blockParams.setMargins(0, 0, 0, 24);
             playerBlock.setLayoutParams(blockParams);
 
+            android.graphics.drawable.GradientDrawable defaultBorder = new android.graphics.drawable.GradientDrawable();
+            defaultBorder.setColor(Color.TRANSPARENT);
+            defaultBorder.setStroke(0, Color.TRANSPARENT);
+            defaultBorder.setCornerRadius(16f);
+            playerBlock.setBackground(defaultBorder);
+            playerBlock.setPadding(16, 16, 16, 16);
+            final int playerIndex = i;
+
             TextInputLayout textInputLayout = new TextInputLayout(this);
             textInputLayout.setHint("Имя игрока " + (i + 1));
             textInputLayout.setBoxBackgroundMode(TextInputLayout.BOX_BACKGROUND_OUTLINE);
@@ -75,6 +106,15 @@ public class LobbyActivity extends AppCompatActivity {
             TextInputEditText editText = new TextInputEditText(textInputLayout.getContext());
             editText.setInputType(InputType.TYPE_CLASS_TEXT);
             editText.setText("Игрок" + (i + 1));
+
+            playerNamesList.add(editText.getText().toString());
+            editText.addTextChangedListener(new android.text.TextWatcher() {
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    playerNamesList.set(playerIndex, s.toString());
+                }
+                public void afterTextChanged(android.text.Editable s) {}
+            });
 
             textInputLayout.addView(editText);
             playerBlock.addView(textInputLayout);
@@ -108,21 +148,40 @@ public class LobbyActivity extends AppCompatActivity {
                                 .build()
                 );
 
+                if (usedColors[c]) {
+                    colorBtn.setVisibility(android.view.View.GONE);
+                }
+
                 int finalC = c;
                 colorBtn.setOnClickListener(v -> {
-                    //TODO: Визуально показываем, что цвет выбран (например, меняем обводку)
-                    // Пока запоминаем в теге
-                    playerBlock.setTag(playerColors[finalC]);
+                    if (playerColorsList.size() > playerIndex) {
+                        playerColorsList.set(playerIndex, playerColors[finalC]);
+                    } else {
+                        playerColorsList.add(playerColors[finalC]);
+                    }
+
+                    android.graphics.drawable.GradientDrawable border = new android.graphics.drawable.GradientDrawable();
+                    border.setColor(Color.TRANSPARENT);
+                    border.setStroke(8, playerColors[finalC]);
+                    border.setCornerRadius(16f);
+                    playerBlock.setBackground(border);
+                    usedColors[finalC] = true;
+
+                    for (int p = 0; p < count; p++) {
+                        if (p == playerIndex) continue;
+                        LinearLayout otherBlock = (LinearLayout) layoutPlayerInputs.getChildAt(p);
+                        LinearLayout otherColorContainer = (LinearLayout) otherBlock.getChildAt(2);
+                        MaterialButton otherColorBtn = (MaterialButton) otherColorContainer.getChildAt(finalC);
+                        otherColorBtn.setVisibility(android.view.View.GONE);
+                    }
                 });
 
                 LinearLayout.LayoutParams btnParams = new LinearLayout.LayoutParams(80, 80);
                 btnParams.setMargins(0, 0, 16, 0);
                 colorBtn.setLayoutParams(btnParams);
-
                 colorContainer.addView(colorBtn);
             }
             playerBlock.addView(colorContainer);
-
             layoutPlayerInputs.addView(playerBlock);
         }
     }
