@@ -16,12 +16,47 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:text="Количество игроков:"
+        android:textColor="@color/text_secondary" />
+
+    <RadioGroup
+        android:id="@+id/radioGroupPlayers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+        <RadioButton
+            android:id="@+id/rb2Players"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2"
+            android:checked="true"/>
+        <RadioButton
+            android:id="@+id/rb3Players"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="3" />
+        <RadioButton
+            android:id="@+id/rb4Players"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="4" />
+    </RadioGroup>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:layout_weight="1"
-        android:text="@string/lobby_stub"
-        android:textColor="@color/text_secondary"
-        android:textSize="16sp" />
+        android:layout_marginBottom="16dp">
+
+        <LinearLayout
+            android:id="@+id/layoutPlayerInputs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnStartGame"
