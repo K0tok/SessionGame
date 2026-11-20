@@ -7,6 +7,10 @@ public interface GameEventListener {
 
     void onTurnChanged(int playerIndex);
 
+    void onDiceRolled(int playerIndex, int value);
+
+    void onTurnSkipped(int playerIndex);
+
     void onMoved(int playerIndex, int fromCell, int toCell);
 
     void onCellEntered(int playerIndex, String cellType);
